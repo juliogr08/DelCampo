@@ -15,17 +15,19 @@ services:
       - key: APP_URL
         sync: false
       - key: DB_CONNECTION
-        value: mysql
+        value: pgsql
       - key: DB_HOST
-        sync: false
+        value: dpg-d50e5875r7bs739c7mlg-a
       - key: DB_PORT
-        value: "3306"
+        value: "5432"
       - key: DB_DATABASE
-        sync: false
+        value: database_j5yk
       - key: DB_USERNAME
-        sync: false
+        value: user
       - key: DB_PASSWORD
         sync: false
+      - key: DB_SSLMODE
+        value: require
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER

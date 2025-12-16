@@ -1,17 +1,18 @@
 # Imagen base PHP con Apache
 FROM php:8.2-apache
 
-# Instalar extensiones necesarias para Laravel
+# Instalar extensiones necesarias para Laravel + PostgreSQL
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libpq-dev \
     zip \
     unzip \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
 # Habilitar mod_rewrite para URLs amigables
 RUN a2enmod rewrite
