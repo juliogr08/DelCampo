@@ -8,6 +8,9 @@ use App\Models\Pedido;
 use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use MercadoPago\SDK;
+use MercadoPago\Preference;
+use MercadoPago\Item;
 
 class CheckoutController extends Controller
 {
@@ -58,6 +61,75 @@ class CheckoutController extends Controller
             'distancia' => $distancia,
             'costo_envio' => $costoEnvio,
             'almacen' => $almacen->nombre_almacen
+        ]);
+    }
+
+    /**
+     * Genera un código QR para el pago usando Mercado Pago
+     * Crea una preferencia de pago real que permite pagos con QR
+     */
+    public function generarQR(Request $request)
+    {
+        $request->validate([
+            'total' => 'required|numeric|min:0',
+            'codigo_pedido' => 'nullable|string',
+        ]);
+
+        $total = $request->total;
+        $codigoPedido = $request->codigo_pedido ?? 'PED-' . time();
+        
+        // Configurar SDK de Mercado Pago
+        SDK::setAccessToken(env('MERCADOPAGO_ACCESS_TOKEN'));
+        
+        // Crear preferencia de pago
+        $preference = new Preference();
+        
+        // Crear item del pedido
+        $item = new Item();
+        $item->title = 'Pedido ' . $codigoPedido;
+        $item->quantity = 1;
+        $item->unit_price = (float) $total;
+        $item->currency_id = 'BOB'; // Bolivianos
+        
+        $preference->items = array($item);
+        
+        // Configuraciones adicionales
+        $preference->external_reference = $codigoPedido;
+        $preference->notification_url = route('tienda.checkout.webhook');
+        $preference->back_urls = [
+            'success' => route('tienda.checkout.success'),
+            'failure' => route('tienda.checkout.failure'),
+            'pending' => route('tienda.checkout.pending'),
+        ];
+        
+        // Configurar para pagos con QR
+        $preference->payment_methods = [
+            'excluded_payment_types' => [],
+            'excluded_payment_methods' => [],
+        ];
+        
+        // Guardar preferencia
+        $preference->save();
+        
+        // Obtener QR code de la preferencia
+        // Mercado Pago genera automáticamente un QR para pagos en efectivo
+        $qrCode = $preference->qr_code ?? null;
+        
+        // Si no hay QR directo, generar uno con la URL de pago
+        if (!$qrCode) {
+            $initPoint = $preference->init_point;
+            $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($initPoint);
+        } else {
+            $qrUrl = $qrCode;
+        }
+
+        return response()->json([
+            'success' => true,
+            'qr_url' => $qrUrl,
+            'preference_id' => $preference->id,
+            'init_point' => $preference->init_point ?? null,
+            'codigo_pedido' => $codigoPedido,
+            'total' => $total,
         ]);
     }
 
@@ -145,5 +217,59 @@ class CheckoutController extends Controller
             DB::rollBack();
             return back()->with('error', 'Error al procesar el pedido. Intente nuevamente.');
         }
+    }
+
+    /**
+     * Callback de éxito de Mercado Pago
+     */
+    public function success(Request $request)
+    {
+        $preferenceId = $request->get('preference_id');
+        $paymentId = $request->get('payment_id');
+        
+        return redirect()->route('tienda.mis-pedidos')
+            ->with('success', '¡Pago realizado exitosamente! Tu pedido está siendo procesado.');
+    }
+
+    /**
+     * Callback de fallo de Mercado Pago
+     */
+    public function failure(Request $request)
+    {
+        return redirect()->route('tienda.checkout')
+            ->with('error', 'El pago no pudo ser procesado. Por favor, intenta nuevamente.');
+    }
+
+    /**
+     * Callback de pago pendiente de Mercado Pago
+     */
+    public function pending(Request $request)
+    {
+        return redirect()->route('tienda.mis-pedidos')
+            ->with('info', 'Tu pago está pendiente de confirmación. Te notificaremos cuando sea aprobado.');
+    }
+
+    /**
+     * Webhook de Mercado Pago para notificaciones de pago
+     */
+    public function webhook(Request $request)
+    {
+        // Verificar que la petición viene de Mercado Pago
+        // En producción, deberías verificar la IP y la firma
+        
+        $data = $request->all();
+        
+        // Procesar notificación de pago
+        if (isset($data['type']) && $data['type'] === 'payment') {
+            $paymentId = $data['data']['id'] ?? null;
+            
+            if ($paymentId) {
+                // Aquí puedes actualizar el estado del pedido según el pago
+                // Por ejemplo, buscar el pedido por external_reference y actualizar su estado
+                \Log::info('Webhook de Mercado Pago recibido', ['payment_id' => $paymentId, 'data' => $data]);
+            }
+        }
+        
+        return response()->json(['status' => 'ok'], 200);
     }
 }

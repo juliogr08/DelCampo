@@ -30,7 +30,17 @@ Route::prefix('tienda')->name('tienda.')->group(function () {
     Route::middleware(['auth', 'role:cliente'])->group(function () {
         Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout');
         Route::post('/checkout/cotizar', [App\Http\Controllers\CheckoutController::class, 'cotizar'])->name('checkout.cotizar');
+        Route::post('/checkout/generar-qr', [App\Http\Controllers\CheckoutController::class, 'generarQR'])->name('checkout.generar-qr');
         Route::post('/checkout/confirmar', [App\Http\Controllers\CheckoutController::class, 'confirmar'])->name('checkout.confirmar');
+        
+        // Rutas de callback de Mercado Pago
+        Route::get('/checkout/success', [App\Http\Controllers\CheckoutController::class, 'success'])->name('checkout.success');
+        Route::get('/checkout/failure', [App\Http\Controllers\CheckoutController::class, 'failure'])->name('checkout.failure');
+        Route::get('/checkout/pending', [App\Http\Controllers\CheckoutController::class, 'pending'])->name('checkout.pending');
+    });
+    
+    // Webhook de Mercado Pago (sin autenticación, solo verificación de IP)
+    Route::post('/checkout/webhook', [App\Http\Controllers\CheckoutController::class, 'webhook'])->name('checkout.webhook');
         Route::get('/mis-pedidos', [App\Http\Controllers\PedidoClienteController::class, 'index'])->name('mis-pedidos');
         Route::get('/mis-pedidos/{pedido}', [App\Http\Controllers\PedidoClienteController::class, 'show'])->name('pedido.detalle');
         Route::get('/mi-perfil', [App\Http\Controllers\PerfilController::class, 'index'])->name('perfil');

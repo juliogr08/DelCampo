@@ -19,44 +19,44 @@ class RolesPermisosSeeder extends Seeder
         // ==========================================
         
         // Permisos de productos
-        Permission::create(['name' => 'ver productos']);
-        Permission::create(['name' => 'crear productos']);
-        Permission::create(['name' => 'editar productos']);
-        Permission::create(['name' => 'eliminar productos']);
+        Permission::firstOrCreate(['name' => 'ver productos']);
+        Permission::firstOrCreate(['name' => 'crear productos']);
+        Permission::firstOrCreate(['name' => 'editar productos']);
+        Permission::firstOrCreate(['name' => 'eliminar productos']);
         
         // Permisos de pedidos
-        Permission::create(['name' => 'ver pedidos']);
-        Permission::create(['name' => 'gestionar pedidos']);
-        Permission::create(['name' => 'cambiar estado pedidos']);
+        Permission::firstOrCreate(['name' => 'ver pedidos']);
+        Permission::firstOrCreate(['name' => 'gestionar pedidos']);
+        Permission::firstOrCreate(['name' => 'cambiar estado pedidos']);
         
         // Permisos de almacenes
-        Permission::create(['name' => 'ver almacenes']);
-        Permission::create(['name' => 'gestionar almacenes']);
+        Permission::firstOrCreate(['name' => 'ver almacenes']);
+        Permission::firstOrCreate(['name' => 'gestionar almacenes']);
         
         // Permisos de clientes
-        Permission::create(['name' => 'ver clientes']);
+        Permission::firstOrCreate(['name' => 'ver clientes']);
         
         // Permisos de reportes
-        Permission::create(['name' => 'ver reportes']);
-        Permission::create(['name' => 'exportar reportes']);
+        Permission::firstOrCreate(['name' => 'ver reportes']);
+        Permission::firstOrCreate(['name' => 'exportar reportes']);
         
         // Permisos de solicitudes
-        Permission::create(['name' => 'ver solicitudes']);
-        Permission::create(['name' => 'gestionar solicitudes']);
+        Permission::firstOrCreate(['name' => 'ver solicitudes']);
+        Permission::firstOrCreate(['name' => 'gestionar solicitudes']);
         
         // Permisos del dashboard
-        Permission::create(['name' => 'ver dashboard']);
+        Permission::firstOrCreate(['name' => 'ver dashboard']);
 
         // ==========================================
         // CREAR ROLES
         // ==========================================
         
         // Rol Admin - Todos los permisos
-        $adminRole = Role::create(['name' => 'admin']);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->givePermissionTo(Permission::all());
         
         // Rol Cliente - Permisos limitados
-        $clienteRole = Role::create(['name' => 'cliente']);
+        $clienteRole = Role::firstOrCreate(['name' => 'cliente']);
         $clienteRole->givePermissionTo([
             'ver productos',
         ]);

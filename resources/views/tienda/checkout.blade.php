@@ -136,6 +136,44 @@
                                 <i class="fas fa-university me-2"></i>Transferencia Bancaria
                             </label>
                         </div>
+                        
+                        <!-- Sección QR Code (se muestra cuando se selecciona pago QR) -->
+                        <div id="qrSection" class="mt-4" style="display: none;">
+                            <div class="card border-primary">
+                                <div class="card-header bg-primary text-white">
+                                    <h6 class="mb-0"><i class="fas fa-qrcode me-2"></i>Código QR para Pago</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <div class="mb-3">
+                                        <img id="qrImage" src="" alt="Código QR" class="img-fluid" style="max-width: 300px; display: none;">
+                                        <div id="qrLoading" class="text-center">
+                                            <i class="fas fa-spinner fa-spin fa-3x text-primary mb-2"></i>
+                                            <p>Generando código QR...</p>
+                                        </div>
+                                    </div>
+                                    <div class="alert alert-info mb-2">
+                                        <small>
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            <strong>Instrucciones:</strong><br>
+                                            1. Escanea este código QR con tu aplicación de banca móvil<br>
+                                            2. O usa la app de Mercado Pago para escanear<br>
+                                            3. Confirma el pago en tu app<br>
+                                            4. El pago se procesará automáticamente
+                                        </small>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <strong>Monto a pagar:</strong> <span id="qrMonto" class="text-primary fw-bold fs-5"></span>
+                                        </small>
+                                    </div>
+                                    <div id="qrLinkSection" style="display: none;" class="mt-2">
+                                        <a href="#" id="qrLink" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-external-link-alt me-1"></i>Abrir en navegador
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -363,6 +401,11 @@ document.getElementById('btnCotizar').addEventListener('click', function() {
         document.getElementById('totalFinal').textContent = (subtotal + data.costo_envio).toFixed(2) + ' Bs';
         document.getElementById('cotizacionResult').style.display = 'block';
         
+        // Si está seleccionado pago QR, regenerar el QR con el nuevo total
+        if (document.getElementById('qr').checked) {
+            generarCodigoQR();
+        }
+        
         this.innerHTML = '<i class="fas fa-calculator me-2"></i>Calcular Costo de Envío';
         this.disabled = false;
     })
@@ -373,6 +416,74 @@ document.getElementById('btnCotizar').addEventListener('click', function() {
         this.disabled = false;
     });
 });
+
+// Manejar cambio de método de pago
+document.querySelectorAll('input[name="metodo_pago"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        if (this.value === 'qr') {
+            generarCodigoQR();
+        } else {
+            document.getElementById('qrSection').style.display = 'none';
+        }
+    });
+});
+
+// Función para generar código QR
+function generarCodigoQR() {
+    const qrSection = document.getElementById('qrSection');
+    const qrImage = document.getElementById('qrImage');
+    const qrLoading = document.getElementById('qrLoading');
+    const qrMonto = document.getElementById('qrMonto');
+    
+    // Mostrar sección QR
+    qrSection.style.display = 'block';
+    qrImage.style.display = 'none';
+    qrLoading.style.display = 'block';
+    
+    // Calcular total
+    const costoEnvio = parseFloat(document.getElementById('costoEnvioResumen').textContent.replace(' Bs', '').replace('--', '0')) || 0;
+    const total = subtotal + costoEnvio;
+    
+    // Mostrar monto
+    qrMonto.textContent = total.toFixed(2) + ' Bs';
+    
+    // Llamar a la API para generar QR
+    fetch('{{ route("tienda.checkout.generar-qr") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            total: total,
+            codigo_pedido: 'PED-' + Date.now()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            qrImage.src = data.qr_url;
+            qrImage.style.display = 'block';
+            qrLoading.style.display = 'none';
+            
+            // Si hay link de pago, mostrarlo
+            if (data.init_point) {
+                const qrLinkSection = document.getElementById('qrLinkSection');
+                const qrLink = document.getElementById('qrLink');
+                qrLink.href = data.init_point;
+                qrLinkSection.style.display = 'block';
+            }
+        } else {
+            alert('Error al generar el código QR. Por favor, verifica tu configuración de Mercado Pago.');
+            qrSection.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al generar el código QR. Por favor, intenta nuevamente.');
+        qrSection.style.display = 'none';
+    });
+}
 
 // Validar antes de enviar
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {

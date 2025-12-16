@@ -12,6 +12,7 @@
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "maatwebsite/excel": "^1.1",
+        "mercadopago/dx-php": "^3.8",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {
