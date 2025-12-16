@@ -1,20 +1,26 @@
 #!/bin/bash
+set -e
 
-# Generar clave si no existe
-if [ -z "$APP_KEY" ]; then
-    php artisan key:generate --force
-fi
+# Crear directorios necesarios
+mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
 
-# Limpiar caches
-php artisan config:clear
-php artisan cache:clear
-php artisan view:clear
+# Dar permisos
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+
+# Limpiar caches (sin depender de la BD)
+php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
 
 # Crear link de storage
 php artisan storage:link 2>/dev/null || true
 
 # Ejecutar migraciones
-php artisan migrate --force
+echo "==> Running migrations..."
+php artisan migrate --force || echo "Migration failed, continuing anyway..."
+
+echo "==> Your service is live"
 
 # Iniciar Apache
-apache2-foreground
+exec apache2-foreground

@@ -1,7 +1,7 @@
 # Imagen base PHP con Apache
 FROM php:8.2-apache
 
-# Instalar extensiones necesarias para Laravel + PostgreSQL
+# Instalar dependencias del sistema y extensiones PHP
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -9,10 +9,15 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     libpq-dev \
+    libzip-dev \
     zip \
     unzip \
-    libzip-dev \
-    && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar extensiones PHP (PostgreSQL)
+RUN docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo pdo_pgsql pgsql mbstring exif pcntl bcmath gd zip
 
 # Habilitar mod_rewrite para URLs amigables
 RUN a2enmod rewrite
@@ -27,7 +32,7 @@ RUN echo '<Directory /var/www/html/public>\n\
     Options Indexes FollowSymLinks\n\
     AllowOverride All\n\
     Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/laravel.conf \
+    </Directory>' > /etc/apache2/conf-available/laravel.conf \
     && a2enconf laravel
 
 # Instalar Composer
@@ -37,13 +42,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
-# Instalar dependencias
-RUN composer install --optimize-autoloader --no-dev
+# Instalar dependencias PHP
+RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# Dar permisos
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Crear directorios de storage si no existen y dar permisos
+RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache
 
 # Exponer puerto
 EXPOSE 80
