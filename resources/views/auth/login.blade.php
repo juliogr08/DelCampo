@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Iniciar Sesión - Proven</title>
+    <title>Iniciar Sesión - Del Campo</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -14,9 +14,9 @@
     
     <style>
         :root {
-            --verde-bosque: #2E8B57;
-            --verde-hoja: #3CB371;
-            --verde-claro: #90EE90;
+            --verde-bosque: #3D6B1E;
+            --verde-hoja: #4A7C23;
+            --verde-claro: #5A8A2E;
             --marron-tierra: #8B4513;
             --beige-arena: #F5DEB3;
             --azul-cielo: #87CEEB;
@@ -25,7 +25,7 @@
         }
 
         .login-page {
-            background: linear-gradient(135deg, var(--verde-bosque) 0%, var(--verde-hoja) 100%);
+            background: linear-gradient(135deg, #3D6B1E 0%, #4A7C23 50%, #5A8A2E 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -40,12 +40,15 @@
         .login-logo {
             font-size: 2.5rem;
             font-weight: 300;
-            color: white !important;
             margin-bottom: 1rem;
         }
 
+        .login-logo a {
+            color: white !important;
+        }
+
         .login-logo i {
-            color: var(--verde-claro);
+            color: white !important;
         }
 
         .login-card-body {
@@ -87,6 +90,16 @@
         .alert {
             border-radius: 5px;
         }
+
+        .alert-success {
+            background-color: #3D6B1E;
+            border-color: #2D5016;
+            color: white;
+        }
+
+        .alert-success .close {
+            color: white;
+        }
     </style>
 </head>
 <body class="hold-transition login-page">
@@ -94,7 +107,7 @@
     <!-- Logo -->
     <div class="login-logo">
         <a href="{{ route('login') }}">
-            <i class="fas fa-leaf"></i> <b>Proven</b>
+            <i class="fas fa-seedling"></i> <b>Del Campo</b>
         </a>
     </div>
 

@@ -12,6 +12,7 @@ class Almacen extends Model
     protected $table = 'almacenes';
 
     protected $fillable = [
+        'tienda_id',
         'nombre_almacen',
         'ubicacion',
         'latitud',
@@ -23,7 +24,8 @@ class Almacen extends Model
         'responsable',
         'telefono_contacto',
         'activo',
-        'es_principal'
+        'es_principal',
+        'es_sede_principal'
     ];
 
     protected $casts = [
@@ -32,7 +34,8 @@ class Almacen extends Model
         'latitud' => 'decimal:8',
         'longitud' => 'decimal:8',
         'activo' => 'boolean',
-        'es_principal' => 'boolean'
+        'es_principal' => 'boolean',
+        'es_sede_principal' => 'boolean'
     ];
 
     const ESTADOS = [
@@ -59,6 +62,21 @@ class Almacen extends Model
     public function solicitudesReposicion()
     {
         return $this->hasMany(SolicitudReposicion::class);
+    }
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class);
+    }
+
+    public function scopeDeTienda($query, $tiendaId)
+    {
+        return $query->where('tienda_id', $tiendaId);
+    }
+
+    public function scopeDelAdmin($query)
+    {
+        return $query->whereNull('tienda_id');
     }
 
     public function scopeActivos($query)

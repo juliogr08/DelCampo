@@ -4,7 +4,7 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section class="hero text-center position-relative">
+    <section class="hero text-center position-relative" style="background: linear-gradient(rgba(45, 80, 22, 0.75), rgba(74, 124, 35, 0.8)), url('{{ asset('images/campo_hero.png') }}'); background-size: cover; background-position: center;">
         <div class="container position-relative" style="z-index: 2;">
             <h1 class="display-4 fw-bold mb-3">Del Campo a Tu Mesa</h1>
             <p class="lead mb-4 fs-5">Productos frescos cultivados en el campo boliviano.<br>Papas, choclo, verduras y más, directos a tu hogar.</p>

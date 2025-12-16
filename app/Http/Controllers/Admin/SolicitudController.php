@@ -12,15 +12,21 @@ class SolicitudController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SolicitudReposicion::with(['almacen', 'producto']);
+        $query = SolicitudReposicion::with(['almacen', 'producto', 'tiendaSolicitante']);
+
+        // Filtrar por tipo (tienda_a_admin o admin_a_productor)
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
 
         if ($request->filled('estado')) {
             $query->where('estado', $request->estado);
         }
 
         $solicitudes = $query->latest()->paginate(15);
+        $tipoActual = $request->get('tipo', 'admin_a_productor');
 
-        return view('admin.solicitudes.index', compact('solicitudes'));
+        return view('admin.solicitudes.index', compact('solicitudes', 'tipoActual'));
     }
 
     public function create()
@@ -112,9 +118,22 @@ class SolicitudController extends Controller
             'fecha_respuesta' => now()
         ]);
 
-        $solicitud->producto->increment('stock', $request->cantidad_recibida);
+        // Add stock to the product
+        $producto = $solicitud->producto;
+        $producto->increment('stock', $request->cantidad_recibida);
+        
+        // If product belongs to a store and was inactive, activate it now that it has stock
+        if ($producto->tienda_id && !$producto->activo && $producto->stock > 0) {
+            $producto->update(['activo' => true]);
+        }
+
+        $mensaje = "Recibidas {$request->cantidad_recibida} unidades. Stock actualizado.";
+        if ($producto->tienda_id && $producto->activo) {
+            $mensaje .= " El producto de la tienda fue activado automáticamente.";
+        }
 
         return redirect()->route('admin.solicitudes.index')
-            ->with('success', "Recibidas {$request->cantidad_recibida} unidades. Stock actualizado.");
+            ->with('success', $mensaje);
     }
 }
+

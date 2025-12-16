@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @stack('styles')
     
     <style>
         :root {
@@ -416,18 +417,39 @@
                             </a>
                         </li>
                     @else
+                        @if(Auth::user()->tienda)
+                            <!-- Botón para dueños de tienda -->
+                            <li class="nav-item me-2">
+                                <a href="{{ route('tienda.panel.dashboard') }}" class="btn btn-warning btn-sm" 
+                                   style="font-weight: 700;">
+                                    <i class="fas fa-tachometer-alt me-1"></i> Mi Panel
+                                </a>
+                            </li>
+                        @endif
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle px-3" href="#" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle me-1"></i>
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="{{ route('tienda.mis-pedidos') }}">
-                                    <i class="fas fa-box me-2 text-muted"></i>Mis Pedidos
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ route('tienda.perfil') }}">
-                                    <i class="fas fa-user me-2 text-muted"></i>Mi Perfil
-                                </a></li>
+                                @if(Auth::user()->tienda)
+                                    <li><a class="dropdown-item" href="{{ route('tienda.panel.dashboard') }}">
+                                        <i class="fas fa-tachometer-alt me-2 text-warning"></i>Panel de Tienda
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                @endif
+                                @if(Auth::user()->hasRole('admin'))
+                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">
+                                        <i class="fas fa-cog me-2 text-primary"></i>Panel Admin
+                                    </a></li>
+                                @else
+                                    <li><a class="dropdown-item" href="{{ route('tienda.mis-pedidos') }}">
+                                        <i class="fas fa-box me-2 text-muted"></i>Mis Pedidos
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{{ route('tienda.mi-perfil') }}">
+                                        <i class="fas fa-user me-2 text-muted"></i>Mi Perfil
+                                    </a></li>
+                                @endif
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">

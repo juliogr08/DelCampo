@@ -36,10 +36,8 @@ class DashboardController extends Controller
             'promedio_venta' => Pedido::whereNotIn('estado', ['cancelado'])
                 ->whereBetween('created_at', [$fechaInicio, $fechaFin])
                 ->avg('total') ?? 0,
-            'clientes_nuevos' => User::where('rol', 'cliente')
-                ->whereBetween('created_at', [$fechaInicio, $fechaFin])
-                ->count(),
-            'clientes_total' => User::where('rol', 'cliente')->count(),
+            'tiendas_activas' => \App\Models\Tienda::where('estado', 'activa')->count(),
+            'tiendas_total' => \App\Models\Tienda::count(),
             'productos_activos' => Producto::where('activo', true)->count(),
             'productos_stock_bajo' => Producto::whereRaw('stock <= stock_minimo')->count(),
         ];

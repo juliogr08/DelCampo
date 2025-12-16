@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - Proven')
+@section('title', 'Dashboard - Del Campo')
 
 @section('content-header', 'Panel de Control')
 

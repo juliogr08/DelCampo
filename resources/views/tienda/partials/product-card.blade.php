@@ -8,6 +8,25 @@
     @endif
     
     <div class="card-body d-flex flex-column">
+        {{-- Store info badge --}}
+        @if($producto->tienda)
+            <a href="{{ route('tienda.perfil', $producto->tienda->slug) }}" 
+               class="d-flex align-items-center text-decoration-none mb-2 store-badge">
+                @if($producto->tienda->logo_path)
+                    <img src="{{ asset('storage/' . $producto->tienda->logo_path) }}" 
+                         class="rounded-circle me-2" 
+                         style="width: 24px; height: 24px; object-fit: cover;"
+                         alt="{{ $producto->tienda->nombre }}">
+                @else
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-2" 
+                         style="width: 24px; height: 24px; font-size: 12px;">
+                        <i class="fas fa-store"></i>
+                    </div>
+                @endif
+                <small class="text-muted">{{ Str::limit($producto->tienda->nombre, 20) }}</small>
+            </a>
+        @endif
+        
         <span class="badge bg-secondary mb-2" style="width: fit-content;">{{ $producto->categoria_nombre }}</span>
         
         <h5 class="card-title">{{ $producto->nombre }}</h5>
@@ -33,3 +52,11 @@
         </span>
     @endif
 </div>
+
+<style>
+.store-badge:hover small {
+    color: var(--bs-primary) !important;
+    text-decoration: underline;
+}
+</style>
+

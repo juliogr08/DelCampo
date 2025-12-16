@@ -8,7 +8,7 @@
 @endsection
 
 @section('content')
-    <!-- Filtro de fechas -->
+    
     <div class="row mb-3">
         <div class="col-12">
             <div class="card card-outline card-primary">
@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- KPIs Principales -->
+    
     <div class="row">
         <div class="col-lg-3 col-6">
             <div class="small-box bg-gradient-success">
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <!-- Segunda fila de KPIs -->
+    
     <div class="row">
         <div class="col-md-3 col-sm-6">
             <div class="info-box bg-light">
@@ -112,27 +112,27 @@
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="info-box bg-light">
-                <span class="info-box-icon bg-info"><i class="fas fa-user-plus"></i></span>
+                <span class="info-box-icon bg-info"><i class="fas fa-store"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Nuevos Clientes ({{ $dias }}d)</span>
-                    <span class="info-box-number">{{ $kpis['clientes_nuevos'] }}</span>
+                    <span class="info-box-text">Tiendas Activas</span>
+                    <span class="info-box-number">{{ $kpis['tiendas_activas'] ?? 0 }}</span>
                 </div>
             </div>
         </div>
         <div class="col-md-3 col-sm-6">
             <div class="info-box bg-light">
-                <span class="info-box-icon bg-secondary"><i class="fas fa-users"></i></span>
+                <span class="info-box-icon bg-secondary"><i class="fas fa-store-alt"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Total Clientes</span>
-                    <span class="info-box-number">{{ $kpis['clientes_total'] }}</span>
+                    <span class="info-box-text">Total Tiendas</span>
+                    <span class="info-box-number">{{ $kpis['tiendas_total'] ?? 0 }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Gráficos -->
+   .
     <div class="row">
-        <!-- Gráfico de Ventas por Período -->
+        
         <div class="col-lg-8">
             <div class="card card-primary card-outline">
                 <div class="card-header">
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <!-- Gráfico de Estados de Pedidos -->
+     
         <div class="col-lg-4">
             <div class="card card-info card-outline">
                 <div class="card-header">
@@ -164,7 +164,7 @@
     </div>
 
     <div class="row">
-        <!-- Gráfico de Ventas por Categoría -->
+        
         <div class="col-lg-5">
             <div class="card card-success card-outline">
                 <div class="card-header">
@@ -186,7 +186,7 @@
             </div>
         </div>
 
-        <!-- Últimos Pedidos -->
+      
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
@@ -229,7 +229,7 @@
             </div>
         </div>
 
-        <!-- Stock Bajo -->
+       
         <div class="col-lg-3">
             <div class="card card-danger card-outline">
                 <div class="card-header">
@@ -275,12 +275,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Datos del backend
+    
     const ventasData = @json($chartData['ventasPorDia']);
     const categoriasData = @json($chartData['categorias']);
     const estadosData = @json($chartData['estados']);
 
-    // 1. Gráfico de Ventas por Período (Línea/Área)
+    
     const ctxVentas = document.getElementById('chartVentas').getContext('2d');
     new Chart(ctxVentas, {
         type: 'line',
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 2. Gráfico de Estados de Pedidos (Donut)
+    
     if(estadosData.labels.length > 0) {
         const ctxEstados = document.getElementById('chartEstados').getContext('2d');
         new Chart(ctxEstados, {
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Gráfico de Ventas por Categoría (Donut)
+    
     if(categoriasData.labels.length > 0) {
         const ctxCategorias = document.getElementById('chartCategorias').getContext('2d');
         new Chart(ctxCategorias, {

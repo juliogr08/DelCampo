@@ -131,7 +131,7 @@ class CheckoutController extends Controller
                     'subtotal' => $item['precio'] * $item['cantidad'],
                 ]);
 
-                $item['producto']->decrement('stock', $item['cantidad']);
+                // NO descontar stock aquí - se descuenta cuando la tienda confirma el pedido
             }
 
             session()->forget('carrito');

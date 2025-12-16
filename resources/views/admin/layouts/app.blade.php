@@ -211,28 +211,56 @@
                         </a>
                     </li>
 
-                    <li class="nav-header">VENTAS</li>
+                    <li class="nav-header">B2B - TIENDAS</li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.pedidos.index') }}" class="nav-link {{ request()->routeIs('admin.pedidos.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-shopping-basket"></i>
-                            <p>Pedidos</p>
+                        <a href="{{ route('admin.tiendas.index') }}" class="nav-link {{ request()->routeIs('admin.tiendas.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-store"></i>
+                            <p>Mis Tiendas</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.clientes.index') }}" class="nav-link {{ request()->routeIs('admin.clientes.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Clientes</p>
+                        <a href="{{ route('admin.solicitudes.index', ['tipo' => 'tienda_a_admin']) }}" class="nav-link {{ request('tipo') == 'tienda_a_admin' ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-inbox"></i>
+                            <p>
+                                Pedidos de Tiendas
+                                @php
+                                    $pedidosTiendas = \App\Models\SolicitudReposicion::where('tipo', 'tienda_a_admin')
+                                        ->where('estado', 'pendiente')
+                                        ->count();
+                                @endphp
+                                @if($pedidosTiendas > 0)
+                                    <span class="badge badge-info right">{{ $pedidosTiendas }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
 
                     <li class="nav-header">INVENTARIO</li>
 
                     <li class="nav-item">
-                        <a href="{{ route('admin.solicitudes.index') }}" class="nav-link {{ request()->routeIs('admin.solicitudes.*') ? 'active' : '' }}">
+                        <a href="{{ route('admin.solicitudes.index', ['tipo' => 'admin_a_productor']) }}" class="nav-link {{ request('tipo') == 'admin_a_productor' || !request('tipo') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-truck-loading"></i>
-                            <p>Solicitudes</p>
+                            <p>Mis Solicitudes</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{{ route('admin.propuestas.index') }}" class="nav-link {{ request()->routeIs('admin.propuestas.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-lightbulb"></i>
+                            <p>
+                                Propuestas
+                                @php
+                                    $pendientesCount = \App\Models\Producto::whereNull('tienda_id')
+                                        ->whereNotNull('propuesto_por_tienda_id')
+                                        ->where('estado_aprobacion', 'pendiente')
+                                        ->count();
+                                @endphp
+                                @if($pendientesCount > 0)
+                                    <span class="badge badge-warning right">{{ $pendientesCount }}</span>
+                                @endif
+                            </p>
                         </a>
                     </li>
 

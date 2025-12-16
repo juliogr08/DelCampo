@@ -10,11 +10,14 @@ class Producto extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tienda_id',
         'nombre',
         'descripcion',
         'imagen',
         'codigo_barras',
         'precio',
+        'precio_mayorista',
+        'precio_sugerido',
         'peso',
         'unidad_medida',
         'categoria',
@@ -24,11 +27,17 @@ class Producto extends Model
         'stock',
         'activo',
         'destacado',
-        'stock_minimo'
+        'stock_minimo',
+        'estado_aprobacion',
+        'propuesto_por_tienda_id',
+        'producto_maestro_id',
+        'motivo_rechazo'
     ];
 
     protected $casts = [
         'precio' => 'decimal:2',
+        'precio_mayorista' => 'decimal:2',
+        'precio_sugerido' => 'decimal:2',
         'peso' => 'decimal:3',
         'temperatura_requerida' => 'decimal:2',
         'fecha_vencimiento' => 'date',
@@ -62,6 +71,8 @@ class Producto extends Model
         'paquete' => 'Paquetes'
     ];
 
+    // === SCOPES ===
+
     public function scopeActivos($query)
     {
         return $query->where('activo', true);
@@ -82,6 +93,63 @@ class Producto extends Model
         return $query->whereRaw('stock <= stock_minimo');
     }
 
+    public function scopeDeTienda($query, $tiendaId)
+    {
+        return $query->where('tienda_id', $tiendaId);
+    }
+
+    public function scopeDelAdmin($query)
+    {
+        return $query->whereNull('tienda_id');
+    }
+
+    // Productos de cualquier tienda (no admin) - para ecommerce
+    public function scopeDeTiendas($query)
+    {
+        return $query->whereNotNull('tienda_id');
+    }
+
+    // Productos maestros: del admin y aprobados
+    public function scopeMaestros($query)
+    {
+        return $query->whereNull('tienda_id')
+                     ->where('estado_aprobacion', 'aprobado');
+    }
+
+    // Productos pendientes de aprobación
+    public function scopePendientesAprobacion($query)
+    {
+        return $query->where('estado_aprobacion', 'pendiente');
+    }
+
+    // Productos aprobados
+    public function scopeAprobados($query)
+    {
+        return $query->where('estado_aprobacion', 'aprobado');
+    }
+
+    // === RELATIONSHIPS ===
+
+    public function tienda()
+    {
+        return $this->belongsTo(Tienda::class);
+    }
+
+    public function propuestoPorTienda()
+    {
+        return $this->belongsTo(Tienda::class, 'propuesto_por_tienda_id');
+    }
+
+    public function productoMaestro()
+    {
+        return $this->belongsTo(Producto::class, 'producto_maestro_id');
+    }
+
+    public function productosDerivados()
+    {
+        return $this->hasMany(Producto::class, 'producto_maestro_id');
+    }
+
     public function detallePedidos()
     {
         return $this->hasMany(DetallePedido::class);
@@ -91,6 +159,8 @@ class Producto extends Model
     {
         return $this->hasMany(SolicitudReposicion::class);
     }
+
+    // === ACCESSORS ===
 
     public function getCategoriaNombreAttribute()
     {
@@ -107,6 +177,13 @@ class Producto extends Model
         return number_format($this->precio, 2) . ' Bs';
     }
 
+    public function getPrecioMayoristaFormateadoAttribute()
+    {
+        return $this->precio_mayorista 
+            ? number_format($this->precio_mayorista, 2) . ' Bs' 
+            : 'No definido';
+    }
+
     public function getImagenUrlAttribute()
     {
         if ($this->imagen) {
@@ -118,5 +195,15 @@ class Producto extends Model
     public function getNecesitaReposicionAttribute()
     {
         return $this->stock <= $this->stock_minimo;
+    }
+
+    public function getEsMaestroAttribute()
+    {
+        return is_null($this->tienda_id) && $this->estado_aprobacion === 'aprobado';
+    }
+
+    public function getEstaPendienteAttribute()
+    {
+        return $this->estado_aprobacion === 'pendiente';
     }
 }

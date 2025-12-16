@@ -10,7 +10,7 @@
         <div class="col-md-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    <form action="{{ route('tienda.perfil.update') }}" method="POST">
+                    <form action="{{ route('tienda.mi-perfil.update') }}" method="POST">
                         @csrf
                         @method('PUT')
                         

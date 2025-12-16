@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Proven')</title>
+    <title>@yield('title', 'Del Campo')</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -109,7 +109,7 @@
         <!-- Brand Logo -->
         <a href="{{ url('/') }}" class="brand-link">
             <i class="fas fa-leaf brand-icon"></i>
-            <span class="brand-text font-weight-light">Proven</span>
+            <span class="brand-text font-weight-light">Del Campo</span>
         </a>
 
         <!-- Sidebar -->
@@ -198,7 +198,7 @@
         </div>
         <strong>
             <i class="fas fa-earth-americas"></i>
-            Proven &copy; {{ date('Y') }}
+            Del Campo &copy; {{ date('Y') }}
         </strong>
     </footer>
 </div>

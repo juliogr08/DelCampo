@@ -45,6 +45,16 @@ class User extends Authenticatable
         return $this->hasRole('cliente') || $this->rol === 'cliente';
     }
 
+    public function isTienda()
+    {
+        return $this->hasRole('tienda') || $this->rol === 'tienda';
+    }
+
+    public function tienda()
+    {
+        return $this->hasOne(Tienda::class);
+    }
+
     public function pedidos()
     {
         return $this->hasMany(Pedido::class);
@@ -53,9 +63,20 @@ class User extends Authenticatable
     public function getRolNombreAttribute()
     {
         if ($this->roles->isNotEmpty()) {
-            return $this->roles->first()->name === 'admin' ? 'Administrador' : 'Cliente';
+            $roleName = $this->roles->first()->name;
+            $nombres = [
+                'admin' => 'Administrador',
+                'cliente' => 'Cliente',
+                'tienda' => 'Tienda',
+            ];
+            return $nombres[$roleName] ?? ucfirst($roleName);
         }
-        return $this->rol === 'admin' ? 'Administrador' : 'Cliente';
+        $nombres = [
+            'admin' => 'Administrador',
+            'cliente' => 'Cliente',
+            'tienda' => 'Tienda',
+        ];
+        return $nombres[$this->rol] ?? 'Cliente';
     }
 
     public function getDireccionCompletaAttribute()
@@ -64,3 +85,4 @@ class User extends Authenticatable
         return implode(', ', $partes) ?: 'Sin dirección';
     }
 }
+

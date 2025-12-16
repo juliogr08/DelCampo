@@ -32,6 +32,20 @@
                             </select>
                         </div>
                         
+                        @if(isset($tiendas) && $tiendas->count() > 0)
+                            <div class="mb-3">
+                                <label class="form-label">Tienda</label>
+                                <select name="tienda" class="form-select">
+                                    <option value="">Todas las tiendas</option>
+                                    @foreach($tiendas as $t)
+                                        <option value="{{ $t->id }}" {{ request('tienda') == $t->id ? 'selected' : '' }}>
+                                            {{ $t->nombre }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
+                        
                         <div class="mb-3">
                             <label class="form-label">Ordenar por</label>
                             <select name="orden" class="form-select">
@@ -45,7 +59,7 @@
                         <button type="submit" class="btn btn-primary w-100">
                             <i class="fas fa-search me-2"></i>Aplicar Filtros
                         </button>
-                        @if(request()->hasAny(['buscar', 'categoria', 'orden']))
+                        @if(request()->hasAny(['buscar', 'categoria', 'orden', 'tienda']))
                             <a href="{{ route('tienda.catalogo') }}" class="btn btn-outline-secondary w-100 mt-2">
                                 Limpiar filtros
                             </a>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Producto - Proven')
+@section('title', 'Editar Producto - Del Campo')
 
 @section('content-header', 'Editar Producto')
 

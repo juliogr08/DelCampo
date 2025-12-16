@@ -87,6 +87,41 @@
                     <p class="small mb-0">Soporte</p>
                 </div>
             </div>
+
+            <!-- Tienda que vende este producto -->
+            @if($producto->tienda)
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="text-muted mb-3"><i class="fas fa-store me-2"></i>Vendido por</h6>
+                    <a href="{{ route('tienda.perfil', $producto->tienda->slug) }}" class="text-decoration-none">
+                        <div class="d-flex align-items-center">
+                            @if($producto->tienda->logo_path)
+                                <img src="{{ asset('storage/' . $producto->tienda->logo_path) }}" 
+                                     alt="{{ $producto->tienda->nombre }}"
+                                     class="rounded-circle shadow-sm me-3"
+                                     style="width: 60px; height: 60px; object-fit: cover;">
+                            @else
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3 shadow-sm"
+                                     style="width: 60px; height: 60px;">
+                                    <i class="fas fa-store fa-lg"></i>
+                                </div>
+                            @endif
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1 text-dark">{{ $producto->tienda->nombre }}</h5>
+                                @if($producto->tienda->descripcion)
+                                    <p class="text-muted small mb-0">{{ Str::limit($producto->tienda->descripcion, 60) }}</p>
+                                @endif
+                            </div>
+                            <div>
+                                <span class="btn btn-outline-primary btn-sm">
+                                    Ver Tienda <i class="fas fa-chevron-right ms-1"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
     
